@@ -116,7 +116,6 @@ def train_transformers_model(
         per_device_eval_batch_size=int(training.get("batch_size", 8)),
         learning_rate=float(training.get("learning_rate", 0.001)),
         weight_decay=float(training.get("weight_decay", 0.0005)),
-        warmup_ratio=0.1 if training.get("warmup", True) else 0.0,
         lr_scheduler_type="cosine",
         evaluation_strategy="epoch",
         save_strategy="epoch",
