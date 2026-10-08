@@ -31,6 +31,10 @@ the layer-4 tensor is a lower-resolution feature.
 - **E3**: E2 plus `CoordinateAttention` on that same feature. The attention
   module pools height and width independently and preserves both spatial size
   and channel count.
+- **E4**: the baseline high-resolution feature plus `MultiScaleFusion`, without
+  the P2 projection.
+- **E5**: the baseline high-resolution feature plus `CoordinateAttention`,
+  without the P2 projection.
 
 `MultiScaleFusion` contains parallel 1x1, 3x3, and dilated 3x3 (dilation 2)
 branches followed by a 1x1 fusion convolution. Attention is intentionally not

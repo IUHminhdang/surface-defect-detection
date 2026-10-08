@@ -43,10 +43,10 @@ def _custom_yaml(ablation: str, weights: str) -> dict[str, Any]:
         add([-1, 2, "C3k2", [256, False]])
     p3_index = 18 if ablation in {"E1", "E2", "E3"} else 16
 
-    if ablation in {"E2", "E3"}:
+    if ablation in {"E2", "E3", "E4"}:
         add([-1, 1, "MultiScaleFusion", [64]])
         p3_index += 1
-    if ablation == "E3":
+    if ablation in {"E3", "E5"}:
         add([-1, 1, "CoordinateAttention", [64]])
         p3_index += 1
 
@@ -72,7 +72,7 @@ def build_yolo11_custom(
     output_dir: str | Path,
     weights: str = "yolo11n.pt",
 ) -> YOLO:
-    if ablation not in {"E0", "E1", "E2", "E3"}:
+    if ablation not in {"E0", "E1", "E2", "E3", "E4", "E5"}:
         raise ValueError(f"Unsupported ablation: {ablation}")
     register_custom_modules()
     output_path = Path(output_dir)

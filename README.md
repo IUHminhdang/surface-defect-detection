@@ -131,7 +131,8 @@ reporting protocol.
 
 The proposed model is named `YOLO11-P2-MSC-CA`. E0 is the unchanged YOLO11n
 baseline; E1 adds P2 fusion, E2 adds multi-scale fusion, and E3 adds coordinate
-attention. See [docs/model_architecture.md](docs/model_architecture.md) and
+attention. E4 and E5 isolate Multi-Scale Fusion and Coordinate Attention
+without P2, respectively. See [docs/model_architecture.md](docs/model_architecture.md) and
 [docs/ablation.md](docs/ablation.md) for the discovered tensor shapes and
 insertion points.
 
