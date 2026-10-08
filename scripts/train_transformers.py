@@ -117,7 +117,6 @@ def train_transformers_model(
         learning_rate=float(training.get("learning_rate", 0.001)),
         weight_decay=float(training.get("weight_decay", 0.0005)),
         lr_scheduler_type="cosine",
-        evaluation_strategy="epoch",
         save_strategy="epoch",
         save_total_limit=2,
         load_best_model_at_end=True,

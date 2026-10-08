@@ -16,3 +16,11 @@ Custom YOLO11 ablations use `--model yolo11-p2-msc-ca` and the
 The baseline E0 remains the existing `--model yolo11` path.
 
 Comparison tables should be generated automatically under `reports/tables/` and figures under `reports/figures/`.
+
+To draw loss and validation curves after a Kaggle run:
+
+```bash
+python scripts/plot_training_history.py \
+  --experiments experiments/yolo11 experiments/yolo11-e1 \
+  experiments/yolo11-e2 experiments/yolo11-e3
+```

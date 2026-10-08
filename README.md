@@ -148,6 +148,27 @@ This script is designed to generate CSV summaries that match the required schema
 - `predictions.csv`
 - `error_analysis.csv`
 
+## Training and validation curves
+
+After training on Kaggle, download the experiment folders or mount them in
+Colab and plot the recorded per-epoch history:
+
+```bash
+python scripts/plot_training_history.py \
+  --experiments experiments/yolo11 experiments/yolo11-e1 \
+  experiments/yolo11-e2 experiments/yolo11-e3 \
+  --output-dir reports/figures
+```
+
+This creates:
+
+- `reports/figures/training_validation_loss.png`
+- `reports/figures/validation_metrics.png`
+
+For YOLO/Ultralytics experiments, the loss curve uses box loss because that is
+the validation loss recorded by the existing CSV pipeline. The figures do not
+recompute metrics and do not use the test split.
+
 ## FPS benchmark
 
 ```bash
