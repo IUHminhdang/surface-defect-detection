@@ -52,14 +52,69 @@ class YoloDetectionDataset(Dataset):
 
 def _collate(batch: list[dict[str, Any]]) -> dict[str, Any]:
     result: dict[str, Any] = {}
+
     for key in batch[0]:
-        values = [item[key].squeeze(0) for item in batch]
+        values = [
+            item[key].squeeze(0)
+            if isinstance(item[key], torch.Tensor) and item[key].ndim == 4
+            else item[key]
+            for item in batch
+        ]
+
         if key == "labels":
+            # Mỗi ảnh có thể có số lượng bounding box khác nhau.
             result[key] = values
+
+        elif key == "pixel_values":
+            # Padding ảnh về cùng H, W trước khi stack.
+            max_h = max(value.shape[-2] for value in values)
+            max_w = max(value.shape[-1] for value in values)
+
+            padded_values = []
+            for value in values:
+                pad_h = max_h - value.shape[-2]
+                pad_w = max_w - value.shape[-1]
+
+                padded = torch.nn.functional.pad(
+                    value,
+                    (0, pad_w, 0, pad_h),
+                    value=0,
+                )
+                padded_values.append(padded)
+
+            result[key] = torch.stack(padded_values)
+
+        elif key == "pixel_mask":
+            # Vùng padding = 0, vùng ảnh thật = 1.
+            max_h = max(value.shape[-2] for value in values)
+            max_w = max(value.shape[-1] for value in values)
+
+            padded_masks = []
+            for value in values:
+                pad_h = max_h - value.shape[-2]
+                pad_w = max_w - value.shape[-1]
+
+                padded = torch.nn.functional.pad(
+                    value,
+                    (0, pad_w, 0, pad_h),
+                    value=0,
+                )
+                padded_masks.append(padded)
+
+            result[key] = torch.stack(padded_masks)
+
         elif isinstance(values[0], torch.Tensor):
-            result[key] = torch.stack(values)
+            try:
+                result[key] = torch.stack(values)
+            except RuntimeError as exc:
+                raise RuntimeError(
+                    f"Cannot stack key={key!r}; "
+                    f"tensor shapes={[tuple(v.shape) for v in values]}"
+                ) from exc
+
         else:
             result[key] = values
+
     return result
 
 
