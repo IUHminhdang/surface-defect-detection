@@ -1,0 +1,2 @@
+experiment,model,seed,epochs,best_epoch,image_size,batch_size,mAP50,mAP50_95,precision,recall,fps,latency_ms,params,flops,model_size_mb,gpu_memory_mb,training_time_sec,checkpoint_path,timestamp
+smoke-yolo11,yolo11n.pt,42,1,1,320,16,0.1263,0.04726,0.30035,0.17188,,,,,5.165,,153.239,experiments\smoke-yolo11\weights\best.pt,2026-10-08T09:49:35.251555+00:00

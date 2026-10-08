@@ -21,6 +21,12 @@ def parse_args() -> argparse.Namespace:
                         default=None)
     parser.add_argument("--experiment", type=str, default=None)
     parser.add_argument("--device", type=str, default="auto")
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=None,
+        help="Override number of training epochs.",
+    )
     return parser.parse_args()
 
 
@@ -82,7 +88,7 @@ def main() -> None:
         project=str(experiment_dir),
         name="run",
         exist_ok=True,
-        epochs=int(training.get("epochs", 50)),
+        epochs=int(training.get("epochs", 50)) if args.epochs is None else args.epochs,
         imgsz=int(training.get("image_size", 640)),
         batch=int(training.get("batch_size", 8)),
         optimizer=str(training.get("optimizer", "AdamW")),
@@ -98,7 +104,7 @@ def main() -> None:
         device=None if args.device == "auto" else args.device,
     )
     elapsed = time.perf_counter() - started
-    run_dir = Path(results.save_dir)
+    run_dir = experiment_dir / "run"
     _copy_checkpoint(run_dir / "weights" / "best.pt", weights_dir / "best.pt")
     _copy_checkpoint(run_dir / "weights" / "last.pt", weights_dir / "last.pt")
 

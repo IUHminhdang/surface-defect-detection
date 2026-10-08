@@ -117,7 +117,8 @@ python scripts/evaluate.py --data-root /path/to/dataset \
   --weights experiments/baseline/weights/best.pt --experiment baseline --split test
 
 python scripts/benchmark_speed.py --data-root /path/to/dataset \
-  --weights experiments/baseline/weights/best.pt --image-size 640 --batch-size 1
+  --weights experiments/yolo11/weights/best.pt --experiment yolo11 \
+  --image-size 640 --batch-size 1 --warmup 20 --iterations 100 --device 0
 ```
 
 These five runs are baseline comparisons only. Do not add a proposed module
@@ -143,7 +144,9 @@ This script is designed to generate CSV summaries that match the required schema
 python scripts/benchmark_speed.py --weights /path/to/best.pt --data-root /path/to/dataset --image-size 640 --batch-size 1
 ```
 
-This tracks the required deployment-latency benchmarking protocol with a warmup phase and batch-size-1 inference timing.
+This tracks the required deployment-latency benchmarking protocol with a warmup
+phase and batch-size-1 inference timing. Each model writes independently to
+`experiments/<experiment>/benchmark_speed.csv`.
 
 ## Error analysis
 
