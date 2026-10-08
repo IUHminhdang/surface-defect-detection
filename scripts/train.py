@@ -104,7 +104,7 @@ def main() -> None:
         device=None if args.device == "auto" else args.device,
     )
     elapsed = time.perf_counter() - started
-    run_dir = experiment_dir / "run"
+    run_dir = Path(results.save_dir)
     _copy_checkpoint(run_dir / "weights" / "best.pt", weights_dir / "best.pt")
     _copy_checkpoint(run_dir / "weights" / "last.pt", weights_dir / "last.pt")
 

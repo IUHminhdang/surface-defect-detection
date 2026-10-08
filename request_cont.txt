@@ -1,0 +1,210 @@
+````text
+You are a senior Computer Vision / Ultralytics YOLO engineer.
+
+Work inside the existing repository:
+surface-defect-detection/
+
+DO NOT rewrite the project or destroy the existing train/evaluate/CSV pipeline. Inspect and reuse the current infrastructure.
+
+## GOAL
+
+Baseline:
+YOLO11n
+
+Full model:
+YOLO11n + P2 High-Resolution Detection + Multi-Scale Feature Fusion + Coordinate Attention
+
+Name:
+YOLO11-P2-MSC-CA
+
+Motivation:
+- P2 → better small-defect detection
+- Multi-Scale → different receptive fields for different defect sizes/shapes
+- Coordinate Attention → feature re-weighting while preserving spatial coordinates
+
+## 1. INSPECT FIRST
+
+Before coding, inspect:
+- Ultralytics version
+- actual YOLO11n graph from `yolo11n.pt`
+- backbone / neck / head
+- P2/P3/P4/P5 feature levels
+- channel sizes and spatial resolutions
+- safe insertion points
+
+Use:
+```python
+from ultralytics import YOLO
+model = YOLO("yolo11n.pt")
+model.info()
+print(model.model)
+````
+
+DO NOT assume layer indices or channels from online examples.
+
+Document the discovered architecture in:
+`docs/model_architecture.md`
+
+## 2. IMPLEMENT
+
+Create/reuse:
+
+```text
+src/surface_defect_detection/models/
+├── p2.py
+├── multiscale.py
+├── coordinate_attention.py
+└── yolo11_custom.py
+```
+
+### P2
+
+* use a genuinely higher-resolution feature
+* connect it to the detection pathway
+* preserve spatial information
+* match tensor dimensions correctly
+
+### Multi-Scale Fusion
+
+Input feature → parallel:
+
+* Conv 1×1
+* Conv 3×3
+* Dilated Conv 3×3, dilation=2
+
+→ Concat → 1×1 Conv fusion
+
+Preserve H/W and keep it lightweight.
+Do NOT put attention inside this module.
+
+### Coordinate Attention
+
+Implement true Coordinate Attention as a separate `nn.Module`.
+Preserve H/W and channel count.
+Do NOT replace it with CBAM or SE.
+
+Choose placement based on the actual YOLO11n graph.
+
+## 3. PRETRAINED WEIGHTS
+
+Reuse `yolo11n.pt` weights wherever shapes are compatible.
+
+Do NOT silently train the entire custom model from scratch.
+
+Log/document:
+
+* reused pretrained layers
+* newly initialized layers
+* incompatible layers
+
+## 4. ABLATION
+
+Support configuration-based experiments:
+
+E0 = YOLO11n
+E1 = YOLO11n + P2
+E2 = YOLO11n + P2 + Multi-Scale
+E3 = YOLO11n + P2 + Multi-Scale + Coordinate Attention
+
+Enable/disable each module through config.
+
+Keep E0 unchanged.
+
+## 5. COMPATIBILITY
+
+Must work with:
+
+* existing `scripts/train.py`
+* existing `scripts/evaluate.py`
+* Kaggle GPU
+* local environment
+* existing dataset-root resolution
+* existing CSV/report pipeline
+
+Do not hard-code dataset paths.
+
+Keep training protocol identical:
+
+* 50 epochs max
+* AdamW
+* cosine scheduler
+* warmup
+* patience=10
+* monitor val mAP50-95
+* save best.pt / last.pt
+* same seed/imgsz/batch/LR/weight decay for E0–E3
+
+## 6. TEST BEFORE TRAINING
+
+Create/run a smoke test before 50 epochs.
+
+Verify:
+
+* module initialization
+* forward pass
+* tensor shapes
+* no NaN/Inf
+* backward/loss
+* save/load checkpoint
+* inference
+* batch size 1 and >1
+* existing evaluate.py can load the custom checkpoint
+
+Run 1 epoch first.
+DO NOT start 50 epochs until smoke test passes.
+
+## 7. EVALUATION
+
+Keep the existing evaluation definition.
+
+Report:
+
+* mAP50
+* mAP50-95
+* Precision
+* Recall
+* FPS
+* latency
+* Params
+* FLOPs
+* model size
+* GPU memory
+* training time
+
+Compare E0 vs E3, especially:
+
+* Small/Medium/Large defects
+* FP/FN
+* localization errors
+* KolektorSDD2 vs Magnetic Tile
+
+Never fabricate results and never use test data for model selection.
+
+## 8. DOCUMENTATION
+
+Update:
+
+* `docs/model_architecture.md`
+* `docs/experiments.md`
+* `docs/ablation.md`
+* `docs/methodology.md`
+* `README.md`
+
+Include architecture, tensor shapes, insertion points, pretrained loading, complexity, and reproduction commands.
+
+## FINAL RESPONSE
+
+After implementation, report only:
+
+1. Files created/modified
+2. Actual YOLO11n architecture discovered
+3. P2/MS/CA insertion points
+4. Tensor shapes
+5. Pretrained weight loading
+6. Smoke-test result + command
+7. Training command
+8. Evaluation command
+9. Compatibility issues/assumptions
+
+```
+```
