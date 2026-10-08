@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import csv
-import json
 import shutil
 import time
 from datetime import datetime, timezone
@@ -73,8 +72,8 @@ def train_transformers_model(
 ) -> None:
     try:
         from transformers import (
-            AutoConfig,
             AutoModelForObjectDetection,
+            AutoModelForZeroShotObjectDetection,
             AutoProcessor,
             TrainingArguments,
             Trainer,
@@ -97,11 +96,15 @@ def train_transformers_model(
     weights_dir = output_dir / "weights"
     output_dir.mkdir(parents=True, exist_ok=True)
     processor = AutoProcessor.from_pretrained(model_id)
-    model = AutoModelForObjectDetection.from_pretrained(
-        model_id,
-        num_labels=1,
-        ignore_mismatched_sizes=True,
+    model_class = (
+        AutoModelForZeroShotObjectDetection
+        if model_key == "grounding-dino"
+        else AutoModelForObjectDetection
     )
+    model_kwargs = {"ignore_mismatched_sizes": True}
+    if model_key == "dino":
+        model_kwargs["num_labels"] = 1
+    model = model_class.from_pretrained(model_id, **model_kwargs)
     train_set = YoloDetectionDataset(data_root, "train", processor, model_key == "grounding-dino")
     val_set = YoloDetectionDataset(data_root, "val", processor, model_key == "grounding-dino")
     use_cuda = device != "cpu" and torch.cuda.is_available()
@@ -131,6 +134,11 @@ def train_transformers_model(
     trainer.save_model(str(weights_dir / "best"))
     processor.save_pretrained(str(weights_dir / "best"))
     shutil.copy2(weights_dir / "best" / "config.json", weights_dir / "config.json")
+    from evaluate_transformers import evaluate_model
+    metrics = evaluate_model(
+        model, processor, data_root, "val", model_key, output_dir,
+        int(training.get("image_size", 640)),
+    )
     history = [row for row in trainer.state.log_history if "loss" in row or "eval_loss" in row]
     with (output_dir / "training_history.csv").open("w", newline="", encoding="utf-8") as handle:
         fields = ["epoch", "train_loss", "val_loss", "precision", "recall", "mAP50", "mAP50_95", "learning_rate", "epoch_time_sec"]
@@ -139,7 +147,8 @@ def train_transformers_model(
             writer.writerow({
                 "epoch": row.get("epoch", ""), "train_loss": row.get("loss", ""),
                 "val_loss": row.get("eval_loss", ""), "learning_rate": row.get("learning_rate", ""),
-                "precision": "", "recall": "", "mAP50": "", "mAP50_95": "",
+                "precision": metrics["precision"], "recall": metrics["recall"],
+                "mAP50": metrics["mAP50"], "mAP50_95": metrics["mAP50_95"],
                 "epoch_time_sec": row.get("train_runtime", ""),
             })
     with (output_dir / "results.csv").open("w", newline="", encoding="utf-8") as handle:
@@ -150,8 +159,10 @@ def train_transformers_model(
         writer.writerow({
             "experiment": experiment, "model": model_id, "seed": training.get("seed", 42),
             "epochs": training.get("epochs", 50), "best_epoch": "", "image_size": training.get("image_size", 640),
-            "batch_size": training.get("batch_size", 8), "mAP50": "", "mAP50_95": "", "precision": "",
-            "recall": "", "fps": "", "latency_ms": "", "params": sum(p.numel() for p in model.parameters()),
+            "batch_size": training.get("batch_size", 8), "mAP50": metrics["mAP50"],
+            "mAP50_95": metrics["mAP50_95"], "precision": metrics["precision"],
+            "recall": metrics["recall"], "fps": "", "latency_ms": "",
+            "params": sum(p.numel() for p in model.parameters()),
             "flops": "", "model_size_mb": "", "gpu_memory_mb": "",
             "training_time_sec": round(time.perf_counter() - started, 3),
             "checkpoint_path": str(weights_dir / "best"), "timestamp": datetime.now(timezone.utc).isoformat(),

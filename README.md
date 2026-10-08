@@ -101,6 +101,17 @@ python scripts/train.py --data-root /path/to/dataset --config configs/default.ya
 
 python scripts/train.py --data-root /path/to/dataset --config configs/default.yaml \
   --model grounding-dino --experiment grounding-dino
+```
+
+For the Transformers models, training evaluates the validation split and
+writes real `mAP50`, `mAP50-95`, `precision`, and `recall` values. Evaluate the
+selected checkpoint on the held-out test split with:
+
+```bash
+python scripts/evaluate_transformers.py \
+  --data-root /path/to/dataset \
+  --weights experiments/dino/weights/best \
+  --model dino --experiment dino --split test
 
 python scripts/evaluate.py --data-root /path/to/dataset \
   --weights experiments/baseline/weights/best.pt --experiment baseline --split test
