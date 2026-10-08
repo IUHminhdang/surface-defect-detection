@@ -1,2 +1,0 @@
-epoch,train_loss,val_loss,precision,recall,mAP50,mAP50_95,learning_rate,epoch_time_sec
-1,2.65274,2.93456,0.30035,0.17188,0.1263,0.04726,0.001,134.965

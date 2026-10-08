@@ -1,7 +1,0 @@
-path: E:\Data (Drive)\IUH\DL\GK\surface-defect-detection\data
-train: images/train
-val: images/val
-test: images/test
-nc: 1
-names:
-  0: defect
