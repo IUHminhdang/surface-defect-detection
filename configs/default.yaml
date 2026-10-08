@@ -1,0 +1,56 @@
+dataset:
+  root: null
+  splits:
+    - train
+    - val
+    - test
+  classes:
+    - defect
+  image_extensions:
+    - .png
+    - .jpg
+    - .jpeg
+    - .bmp
+
+training:
+  seed: 42
+  baseline_model: yolo11
+  model: yolo11n.pt
+  models:
+    yolo11: yolo11n.pt
+    rtdetr: rtdetr-l.pt
+    yolo-world: yolov8s-worldv2.pt
+    dino: IDEA-Research/dino-resnet-50
+    grounding-dino: IDEA-Research/grounding-dino-tiny
+  image_size: 640
+  batch_size: 8
+  optimizer: AdamW
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  scheduler: cosine
+  warmup: true
+  epochs: 50
+  early_stopping:
+    enabled: true
+    patience: 10
+    monitor: mAP50_95
+    mode: max
+  checkpoint:
+    monitor: mAP50_95
+    mode: max
+  gradient_clipping: false
+  gradient_accumulation: false
+
+reporting:
+  results_csv: experiments/{experiment}/results.csv
+  training_history_csv: experiments/{experiment}/training_history.csv
+  predictions_csv: experiments/{experiment}/predictions.csv
+  error_analysis_csv: experiments/{experiment}/error_analysis.csv
+  figure_dir: reports/figures
+  table_dir: reports/tables
+
+exploration:
+  defect_size_metric: bbox_area_ratio
+  defect_size_thresholds:
+    small_max: 0.01
+    medium_max: 0.05

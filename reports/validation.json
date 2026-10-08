@@ -1,0 +1,54 @@
+{
+  "dataset_root": "E:\\Data (Drive)\\IUH\\DL\\GK\\surface-defect-detection\\data",
+  "splits": {
+    "train": {
+      "exists": true,
+      "image_count": 4237,
+      "label_count": 4237,
+      "unlabeled_image_count": 0,
+      "invalid_label_count": 0,
+      "corrupted_image_count": 0,
+      "empty_label_count": 0,
+      "orphan_label_count": 0
+    },
+    "val": {
+      "exists": true,
+      "image_count": 689,
+      "label_count": 689,
+      "unlabeled_image_count": 0,
+      "invalid_label_count": 0,
+      "corrupted_image_count": 0,
+      "empty_label_count": 0,
+      "orphan_label_count": 0
+    },
+    "test": {
+      "exists": true,
+      "image_count": 693,
+      "label_count": 693,
+      "unlabeled_image_count": 0,
+      "invalid_label_count": 0,
+      "corrupted_image_count": 0,
+      "empty_label_count": 0,
+      "orphan_label_count": 0
+    }
+  },
+  "missing_labels": [],
+  "orphan_labels": [],
+  "invalid_labels": [],
+  "corrupted_images": [],
+  "empty_label_files": [],
+  "duplicate_images": [
+    [
+      {
+        "split": "train",
+        "image_path": "E:\\Data (Drive)\\IUH\\DL\\GK\\surface-defect-detection\\data\\images\\train\\ksdd2_10301 (copy).png"
+      },
+      {
+        "split": "train",
+        "image_path": "E:\\Data (Drive)\\IUH\\DL\\GK\\surface-defect-detection\\data\\images\\train\\ksdd2_10301.png"
+      }
+    ]
+  ],
+  "cross_split_duplicates": [],
+  "ready_for_training": true
+}

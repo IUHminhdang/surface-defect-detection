@@ -1,0 +1,43 @@
+dataset:
+  root: /kaggle/input
+  splits:
+    - train
+    - val
+    - test
+  classes:
+    - defect
+
+training:
+  seed: 42
+  baseline_model: yolo11
+  model: yolo11n.pt
+  models:
+    yolo11: yolo11n.pt
+    rtdetr: rtdetr-l.pt
+    yolo-world: yolov8s-worldv2.pt
+    dino: IDEA-Research/dino-resnet-50
+    grounding-dino: IDEA-Research/grounding-dino-tiny
+  image_size: 640
+  batch_size: 8
+  optimizer: AdamW
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  scheduler: cosine
+  warmup: true
+  epochs: 50
+  early_stopping:
+    enabled: true
+    patience: 10
+    monitor: mAP50_95
+    mode: max
+  checkpoint:
+    monitor: mAP50_95
+    mode: max
+
+reporting:
+  results_csv: /kaggle/working/experiments/{experiment}/results.csv
+  training_history_csv: /kaggle/working/experiments/{experiment}/training_history.csv
+  predictions_csv: /kaggle/working/experiments/{experiment}/predictions.csv
+  error_analysis_csv: /kaggle/working/experiments/{experiment}/error_analysis.csv
+  figure_dir: /kaggle/working/reports/figures
+  table_dir: /kaggle/working/reports/tables

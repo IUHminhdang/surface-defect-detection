@@ -1,0 +1,578 @@
+# ROLE
+
+You are a senior Computer Vision / Machine Learning engineer.
+
+Build a reproducible research project for **industrial surface defect object detection**.
+
+The project must run locally and on Kaggle.
+
+---
+
+# 1. DATASET
+
+Combined dataset:
+
+* KolektorSDD2
+* Magnetic Tile Defect Dataset
+
+Already split into:
+
+```text
+train/
+val/
+test/
+```
+
+Task:
+
+```text
+Object Detection
+nc: 1
+class 0 = defect
+```
+
+YOLO label format:
+
+```text
+class_id x_center y_center width height
+```
+
+Current image-level statistics:
+
+```text
+Train: 3217
+Val:    689
+Test:   693
+
+Clean:  3869
+Defect: 730
+```
+
+Do NOT hard-code local paths.
+
+Support both:
+
+```text
+Local dataset path
+Kaggle /kaggle/input/...
+```
+
+---
+
+# 2. RESEARCH PIPELINE
+
+Follow this workflow:
+
+```text
+DATA AUDIT
+    ↓
+BASELINE
+    ↓
+ERROR ANALYSIS
+    ↓
+CHOOSE BASE MODEL
+    ↓
+PROPOSE IMPROVEMENT
+    ↓
+ABLATION
+    ↓
+FINAL BENCHMARK
+```
+
+Do not implement the proposed model before baseline/error analysis.
+
+---
+
+# 3. DATA AUDIT
+
+Create scripts for:
+
+* image counts
+* clean/defect counts
+* image resolution
+* corrupted/missing files
+* invalid YOLO labels
+* total bounding boxes
+* boxes/image
+* bbox width/height
+* bbox area ratio
+* bbox aspect ratio
+* small/medium/large defect distribution
+* duplicate/leakage check
+* GT visualization
+
+If source/domain can be reliably identified, analyze:
+
+```text
+KolektorSDD2
+Magnetic Tile
+```
+
+Save figures to:
+
+```text
+reports/figures/
+```
+
+---
+
+# 4. BASELINE MODELS
+
+Benchmark suitable detectors, prioritizing:
+
+```text
+YOLO11
+RT-DETR
+DINO
+Grounding DINO
+YOLO-World
+```
+
+Do not fabricate results.
+
+Use the same dataset split and evaluation protocol whenever practical.
+
+---
+
+# 5. TRAINING STRATEGY
+
+Do NOT simply train 50 epochs and use the final epoch.
+
+Use:
+
+```text
+Maximum epochs = 50
+        ↓
+Warmup
+        ↓
+Learning-rate scheduler
+        ↓
+Validation every epoch
+        ↓
+Save best checkpoint
+        ↓
+Early stopping
+```
+
+Recommended defaults:
+
+```yaml
+epochs: 50
+
+optimizer: AdamW
+
+scheduler: cosine
+warmup: true
+
+early_stopping:
+  enabled: true
+  patience: 10
+
+checkpoint:
+  monitor: mAP50_95
+  mode: max
+```
+
+Important:
+
+* 50 = maximum epochs, not mandatory epochs.
+* Select `best.pt` using validation `mAP50-95`.
+* Save `last.pt` as well.
+* Early stopping must monitor validation performance, not training loss.
+* Record learning rate every epoch.
+* Use gradient clipping only if needed.
+* Use gradient accumulation only when GPU memory requires it.
+* Do not intentionally increase gradients.
+
+---
+
+# 6. REPRODUCIBILITY
+
+Record:
+
+```text
+seed
+model
+dataset
+image_size
+batch_size
+optimizer
+learning_rate
+weight_decay
+scheduler
+warmup
+epochs
+early_stopping_patience
+best_epoch
+hardware
+software versions
+```
+
+Keep training settings consistent for ablation experiments.
+
+---
+
+# 7. EVALUATION
+
+Report:
+
+```text
+mAP50
+mAP50-95
+Precision
+Recall
+FPS
+Latency
+Parameters
+FLOPs
+Model size
+GPU memory
+Training time
+```
+
+FPS benchmark must use:
+
+* same hardware
+* same image size
+* batch size 1 when measuring deployment latency
+* GPU warmup
+* inference only
+* consistent precision
+* multiple iterations
+
+Document the FPS methodology.
+
+---
+
+# 8. CSV OUTPUT — IMPORTANT
+
+CSV is the **single source of truth**.
+
+Every experiment must generate:
+
+```text
+experiments/<experiment>/
+├── results.csv
+├── training_history.csv
+├── predictions.csv
+├── error_analysis.csv
+└── weights/
+    ├── best.pt
+    └── last.pt
+```
+
+### results.csv
+
+Include:
+
+```text
+experiment
+model
+seed
+epochs
+best_epoch
+image_size
+batch_size
+mAP50
+mAP50_95
+precision
+recall
+fps
+latency_ms
+params
+flops
+model_size_mb
+gpu_memory_mb
+training_time_sec
+checkpoint_path
+timestamp
+```
+
+### training_history.csv
+
+One row per epoch:
+
+```text
+epoch
+train_loss
+val_loss
+precision
+recall
+mAP50
+mAP50_95
+learning_rate
+epoch_time_sec
+```
+
+### predictions.csv
+
+Must support error analysis:
+
+```text
+image_id
+image_path
+domain
+gt_count
+pred_count
+confidence
+iou
+tp
+fp
+fn
+gt_bbox
+pred_bbox
+defect_size
+```
+
+Handle matched and unmatched GT/predictions correctly.
+
+### error_analysis.csv
+
+Include:
+
+```text
+image_id
+domain
+error_type
+defect_size
+confidence
+iou
+gt_area_ratio
+pred_area_ratio
+```
+
+Error types:
+
+```text
+TP
+FP
+FN
+LOCALIZATION_ERROR
+```
+
+---
+
+# 9. ERROR ANALYSIS
+
+Analyze:
+
+### False Positive
+
+Especially on clean images.
+
+### False Negative
+
+Check:
+
+* small defects
+* low contrast
+* boundary defects
+* multiple defects
+* domain-specific failures
+
+### Localization Error
+
+Correct region but poor IoU.
+
+### Defect Size
+
+Report performance for:
+
+```text
+Small
+Medium
+Large
+```
+
+Use the same thresholds defined during dataset audit.
+
+### Domain
+
+If reliable source labels exist:
+
+```text
+KolektorSDD2
+Magnetic Tile
+```
+
+---
+
+# 10. MODEL IMPROVEMENT
+
+Choose the proposed improvement **from observed errors**.
+
+Examples:
+
+```text
+Small-object failure
+→ multi-scale / high-resolution features
+
+Low-contrast failure
+→ feature enhancement / attention
+
+Domain shift
+→ domain adaptation / feature alignment
+
+Many false positives
+→ hard-negative strategy / better training
+```
+
+Do not add modules without a clear hypothesis.
+
+---
+
+# 11. ABLATION
+
+Use controlled experiments:
+
+```text
+E0 = baseline
+
+E1 = baseline + Module A
+
+E2 = baseline + Module B
+
+E3 = baseline + A + B
+
+E4 = full model
+```
+
+Compare:
+
+```text
+mAP50
+mAP50-95
+precision
+recall
+FPS
+latency
+params
+FLOPs
+```
+
+Keep dataset, split, seed, image size and training protocol consistent.
+
+---
+
+# 12. FINAL CSV TABLES
+
+Generate automatically:
+
+```text
+reports/tables/
+├── baseline_comparison.csv
+├── ablation_comparison.csv
+└── final_comparison.csv
+```
+
+No manually copied numbers.
+
+Generate figures automatically from CSV:
+
+```text
+mAP comparison
+FPS comparison
+Params/FLOPs
+mAP vs FPS
+training curves
+error distribution
+small/medium/large performance
+domain performance
+```
+
+Save to:
+
+```text
+reports/figures/
+```
+
+---
+
+# 13. PROJECT STRUCTURE
+
+Use:
+
+```text
+surface-defect-detection/
+├── README.md
+├── requirements.txt
+├── configs/
+├── data/
+├── notebooks/
+├── src/
+├── scripts/
+├── experiments/
+├── reports/
+└── docs/
+```
+
+Important scripts:
+
+```text
+scripts/audit_dataset.py
+scripts/validate_dataset.py
+scripts/train.py
+scripts/evaluate.py
+scripts/benchmark_speed.py
+scripts/error_analysis.py
+```
+
+Create:
+
+```text
+notebooks/kaggle_pipeline.ipynb
+```
+
+for the complete Kaggle workflow.
+
+---
+
+# 14. DOCUMENTATION
+
+Create concise documentation for:
+
+```text
+docs/
+├── dataset.md
+├── methodology.md
+├── baseline_models.md
+├── evaluation.md
+├── error_analysis.md
+├── experiments.md
+├── ablation.md
+└── final_results.md
+```
+
+README must contain actual commands for:
+
+* dataset validation
+* audit
+* training
+* evaluation
+* FPS benchmark
+* error analysis
+
+---
+
+# 15. DEVELOPMENT ORDER
+
+Implement in this order:
+
+```text
+1. Dataset validation + audit
+2. Training infrastructure
+3. Baseline models
+4. Evaluation + CSV
+5. Error analysis
+6. Proposed improvement
+7. Ablation
+8. Final benchmark
+```
+
+FIRST TASK:
+
+Do not train the proposed model.
+
+First inspect the repository and dataset, validate labels, perform the dataset audit, create the project structure, CSV schema, and Kaggle configuration.
+
+Do not guess or fabricate any result.

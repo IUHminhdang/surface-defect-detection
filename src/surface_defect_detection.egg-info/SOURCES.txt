@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+src/surface_defect_detection/__init__.py
+src/surface_defect_detection/config.py
+src/surface_defect_detection/dataset.py
+src/surface_defect_detection.egg-info/PKG-INFO
+src/surface_defect_detection.egg-info/SOURCES.txt
+src/surface_defect_detection.egg-info/dependency_links.txt
+src/surface_defect_detection.egg-info/top_level.txt

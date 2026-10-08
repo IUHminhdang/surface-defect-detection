@@ -1,0 +1,146 @@
+{
+  "validation": {
+    "dataset_root": "E:\\Data (Drive)\\IUH\\DL\\GK\\surface-defect-detection\\data",
+    "splits": {
+      "train": {
+        "exists": true,
+        "image_count": 4237,
+        "label_count": 4237,
+        "unlabeled_image_count": 0,
+        "invalid_label_count": 0,
+        "corrupted_image_count": 0,
+        "empty_label_count": 0,
+        "orphan_label_count": 0
+      },
+      "val": {
+        "exists": true,
+        "image_count": 689,
+        "label_count": 689,
+        "unlabeled_image_count": 0,
+        "invalid_label_count": 0,
+        "corrupted_image_count": 0,
+        "empty_label_count": 0,
+        "orphan_label_count": 0
+      },
+      "test": {
+        "exists": true,
+        "image_count": 693,
+        "label_count": 693,
+        "unlabeled_image_count": 0,
+        "invalid_label_count": 0,
+        "corrupted_image_count": 0,
+        "empty_label_count": 0,
+        "orphan_label_count": 0
+      }
+    },
+    "missing_labels": [],
+    "orphan_labels": [],
+    "invalid_labels": [],
+    "corrupted_images": [],
+    "empty_label_files": [],
+    "duplicate_images": [
+      [
+        {
+          "split": "train",
+          "image_path": "E:\\Data (Drive)\\IUH\\DL\\GK\\surface-defect-detection\\data\\images\\train\\ksdd2_10301 (copy).png"
+        },
+        {
+          "split": "train",
+          "image_path": "E:\\Data (Drive)\\IUH\\DL\\GK\\surface-defect-detection\\data\\images\\train\\ksdd2_10301.png"
+        }
+      ]
+    ],
+    "cross_split_duplicates": [],
+    "ready_for_training": true
+  },
+  "split_summary": [
+    {
+      "split": "test",
+      "images": 693,
+      "defect_images": 111,
+      "clean_images": 582,
+      "total_boxes": 123
+    },
+    {
+      "split": "train",
+      "images": 4237,
+      "defect_images": 1530,
+      "clean_images": 2707,
+      "total_boxes": 1737
+    },
+    {
+      "split": "val",
+      "images": 689,
+      "defect_images": 109,
+      "clean_images": 580,
+      "total_boxes": 128
+    }
+  ],
+  "bbox_summary": {
+    "width_norm": {
+      "count": 1988.0,
+      "mean": 0.2989357047283702,
+      "std": 0.3002036057342782,
+      "min": 0.003322,
+      "25%": 0.071146,
+      "50%": 0.186667,
+      "75%": 0.40565949999999995,
+      "max": 1.0
+    },
+    "height_norm": {
+      "count": 1988.0,
+      "mean": 0.17611026911468813,
+      "std": 0.20022251220970808,
+      "min": 0.002994,
+      "25%": 0.051724,
+      "50%": 0.101654,
+      "75%": 0.209302,
+      "max": 1.0
+    },
+    "width_px": {
+      "count": 1988.0,
+      "mean": 84.79024291348088,
+      "std": 111.91977599252725,
+      "min": 0.999935,
+      "25%": 16.00001275,
+      "50%": 45.000102999999996,
+      "75%": 108.000064,
+      "max": 620.0
+    },
+    "height_px": {
+      "count": 1988.0,
+      "mean": 72.25654159305836,
+      "std": 68.3754588658895,
+      "min": 0.999996,
+      "25%": 22.999926000000002,
+      "50%": 49.00015,
+      "75%": 97.999968,
+      "max": 422.99968
+    },
+    "area_ratio": {
+      "count": 1988.0,
+      "mean": 0.079498773820002,
+      "std": 0.1449290651673885,
+      "min": 1.377204e-05,
+      "25%": 0.004892101103,
+      "50%": 0.016778368975,
+      "75%": 0.0695156201205,
+      "max": 1.0
+    },
+    "aspect_ratio": {
+      "count": 1988.0,
+      "mean": 2.4223614423692097,
+      "std": 2.208307981971695,
+      "min": 0.024449388703547768,
+      "25%": 0.9276161796612542,
+      "50%": 1.8188427395840083,
+      "75%": 3.151482411261877,
+      "max": 14.358455788234089
+    }
+  },
+  "defect_size_distribution": {
+    "medium": 619,
+    "small": 772,
+    "large": 597
+  }
+}
