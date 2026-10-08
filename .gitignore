@@ -12,3 +12,4 @@ experiments/*/weights/*.pt
 reports/figures/*.png
 reports/tables/*.csv
 data/
+experiments/
