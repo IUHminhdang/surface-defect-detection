@@ -11,4 +11,8 @@ Each experiment should produce:
 - `weights/best.pt`
 - `weights/last.pt`
 
+Custom YOLO11 ablations use `--model yolo11-p2-msc-ca` and the
+`training.custom.ablation` value (`E1`, `E2`, or `E3`) in the selected config.
+The baseline E0 remains the existing `--model yolo11` path.
+
 Comparison tables should be generated automatically under `reports/tables/` and figures under `reports/figures/`.

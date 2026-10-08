@@ -1,11 +1,28 @@
 # Ablation studies
 
-Ablations are planned to follow the controlled structure described in the brief:
+The implemented controlled ablation is:
 
-- E0 = baseline
-- E1 = baseline + Module A
-- E2 = baseline + Module B
-- E3 = baseline + A + B
-- E4 = full model
+- E0 = unchanged YOLO11n
+- E1 = YOLO11n + P2 high-resolution fusion
+- E2 = E1 + multi-scale fusion
+- E3 = E2 + coordinate attention
 
-The same dataset, split, seed, image size, and training protocol should be held constant so any gains can be attributed to the intended module change.
+The same dataset, split, seed, image size, batch size, AdamW optimizer, cosine
+schedule, warmup, patience, and checkpoint policy are used for every variant.
+Only the explicitly enabled module changes.
+
+For E1-E3, select the variant in `configs/default.yaml`:
+
+```yaml
+training:
+  custom:
+    ablation: E3
+```
+
+Then run:
+
+```bash
+python scripts/train.py --data-root /path/to/dataset \
+  --config configs/default.yaml --model yolo11-p2-msc-ca \
+  --experiment yolo11-e3
+```

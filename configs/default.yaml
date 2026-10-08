@@ -16,6 +16,8 @@ training:
   seed: 42
   baseline_model: yolo11
   model: yolo11n.pt
+  custom:
+    ablation: E3
   models:
     yolo11: yolo11n.pt
     rtdetr: rtdetr-l.pt

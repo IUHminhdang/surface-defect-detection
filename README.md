@@ -101,6 +101,10 @@ python scripts/train.py --data-root /path/to/dataset --config configs/default.ya
 
 python scripts/train.py --data-root /path/to/dataset --config configs/default.yaml \
   --model grounding-dino --experiment grounding-dino
+
+# Proposed YOLO11-P2-MSC-CA, with E1/E2/E3 selected in training.custom.ablation
+python scripts/train.py --data-root /path/to/dataset --config configs/default.yaml \
+  --model yolo11-p2-msc-ca --experiment yolo11-e3
 ```
 
 For the Transformers models, training evaluates the validation split and
@@ -124,6 +128,12 @@ python scripts/benchmark_speed.py --data-root /path/to/dataset \
 These five runs are baseline comparisons only. Do not add a proposed module
 until all selected baseline runs have been evaluated with the same split and
 reporting protocol.
+
+The proposed model is named `YOLO11-P2-MSC-CA`. E0 is the unchanged YOLO11n
+baseline; E1 adds P2 fusion, E2 adds multi-scale fusion, and E3 adds coordinate
+attention. See [docs/model_architecture.md](docs/model_architecture.md) and
+[docs/ablation.md](docs/ablation.md) for the discovered tensor shapes and
+insertion points.
 
 ## Evaluation
 

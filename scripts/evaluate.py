@@ -12,6 +12,7 @@ from ultralytics import YOLO
 
 from surface_defect_detection.config import load_yaml_config, resolve_dataset_root
 from surface_defect_detection.dataset import _parse_yolo_label_row
+from surface_defect_detection.models.yolo11_custom import register_custom_modules
 
 
 def parse_args() -> argparse.Namespace:
@@ -57,6 +58,7 @@ def main() -> None:
     if root is None:
         raise FileNotFoundError("Dataset root could not be resolved.")
     config = load_yaml_config(args.config)
+    register_custom_modules()
     image_size = int(config.get("training", {}).get("image_size", 640))
     experiment_dir = Path("experiments") / args.experiment
     image_dir = root / "images" / args.split
